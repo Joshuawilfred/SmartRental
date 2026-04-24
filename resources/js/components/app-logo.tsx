@@ -7,8 +7,8 @@ export default function AppLogo() {
                 <AppLogoIcon className="size-5 fill-current text-white dark:text-black" />
             </div>
             <div className="ml-1 grid flex-1 text-left text-sm">
-                <span className="mb-0.5 truncate leading-tight font-semibold">
-                    SmartRental
+                <span className="text-[18px] font-semibold tracking-tight text-[#F0F6F8]">
+                    Smart<span className="text-[#00E676]">Rental</span>
                 </span>
             </div>
         </>
