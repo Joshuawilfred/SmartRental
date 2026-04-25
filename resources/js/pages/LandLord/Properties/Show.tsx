@@ -150,6 +150,19 @@ export default function PropertiesShow({ property }: Props) {
                             </svg>
                             Edit property
                         </Link>
+                        <Link
+                            // href={`/landlord/tenants/create?property_id=${property.id}`}
+                            href={"#"}
+                            className="w-full flex items-center justify-center gap-2 py-2.5 border border-white/10 text-[#F0F6F8]/70 text-sm font-medium rounded-lg hover:bg-white/5 transition-colors mb-2"
+                        >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <line x1="19" y1="8" x2="19" y2="14" />
+                                <line x1="22" y1="11" x2="16" y2="11" />
+                            </svg>
+                            Add tenant
+                        </Link>
                         <button
                             onClick={handleDelete}
                             disabled={deleting}
