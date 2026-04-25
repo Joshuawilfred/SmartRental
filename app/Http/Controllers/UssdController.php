@@ -6,20 +6,19 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Services\UssdService;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class UssdController extends Controller
 {
     public function __construct(protected UssdService $ussd) {}
 
-    /**
-     * Main USSD callback — Africa's Talking POSTs here on every user interaction.
-     * Route: POST /ussd/callback  (CSRF excluded)
-     */
     public function handle(Request $request): Response
     {
+        $request->headers->set('Accept', 'application/json');
+
         $sessionId   = $request->input('sessionId', '');
         $phoneNumber = $request->input('phoneNumber', '');
-        $text        = $request->input('text', '');
+        $text        = $request->input('text') ?? ''; // null → '' (fixes ConvertEmptyStringsToNull)
 
         Log::info('USSD request', [
             'sessionId'   => $sessionId,
@@ -27,36 +26,41 @@ class UssdController extends Controller
             'text'        => $text,
         ]);
 
-        $response = $this->ussd->processMenu($sessionId, $phoneNumber, $text);
-
-        Log::info('USSD response', [
-            'sessionId'  => $sessionId,
-            'type'       => str_starts_with($response, 'CON') ? 'CON' : 'END',
-            'response'   => $response,
-        ]);
+        try {
+            $response = $this->ussd->processMenu($sessionId, $phoneNumber, $text);
+        } catch (Throwable $e) {
+            Log::error('USSD handler crashed', [
+                'error' => $e->getMessage(),
+                'file'  => $e->getFile(),
+                'line'  => $e->getLine(),
+            ]);
+            $response = 'END Sorry, something went wrong. Please try again.';
+        }
 
         return response($response, 200)
             ->header('Content-Type', 'text/plain');
     }
 
-    /**
-     * End-of-session notification — Africa's Talking POSTs here when a session closes.
-     * Route: POST /ussd/notify  (CSRF excluded)
-     */
     public function notify(Request $request): Response
     {
-        Log::info('USSD session ended', [
-            'sessionId'        => $request->input('sessionId'),
-            'phoneNumber'      => $request->input('phoneNumber'),
-            'status'           => $request->input('status'),        // Success | Incomplete | Failed
-            'durationInMillis' => $request->input('durationInMillis'),
-            'hopsCount'        => $request->input('hopsCount'),
-            'cost'             => $request->input('cost'),
-            'input'            => $request->input('input'),
-            'lastAppResponse'  => $request->input('lastAppResponse'),
-            'errorMessage'     => $request->input('errorMessage'),  // only on Failed
-        ]);
+        $request->headers->set('Accept', 'application/json');
 
-        return response('OK', 200);
+        try {
+            Log::info('USSD session ended', [
+                'sessionId'        => $request->input('sessionId'),
+                'phoneNumber'      => $request->input('phoneNumber'),
+                'status'           => $request->input('status'),
+                'durationInMillis' => $request->input('durationInMillis'),
+                'hopsCount'        => $request->input('hopsCount'),
+                'cost'             => $request->input('cost'),
+                'input'            => $request->input('input'),
+                'lastAppResponse'  => $request->input('lastAppResponse'),
+                'errorMessage'     => $request->input('errorMessage'),
+            ]);
+        } catch (Throwable $e) {
+            Log::error('USSD notify crashed', ['error' => $e->getMessage()]);
+        }
+
+        return response('OK', 200)->header('Content-Type', 'text/plain');
     }
 }

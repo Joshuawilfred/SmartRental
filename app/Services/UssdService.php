@@ -27,7 +27,7 @@ class UssdService
 {
     // ─── Hardcoded demo tenant (swap for DB lookup in production) ───────────────
     private array $demoTenant = [
-        'pin'         => '1234',
+        'pin'         => '2525',
         'phone'       => '+255612422001',
         'name'        => 'John Doe',
         'room'        => 'B12',
