@@ -1,7 +1,28 @@
 export type * from './auth';
 export type * from './navigation';
 export type * from './ui';
-
+export type * from './property';
+ 
+export interface User {
+    id: number;
+    name: string;
+    email: string;
+    role: 'landlord' | 'tenant';
+    phone: string | null;
+    avatar: string | null;
+    created_at: string;
+}
+ 
+export interface PageProps {
+    [key: string]: unknown;
+    auth: {
+        user: User;
+    };
+    flash?: {
+        success?: string;
+        error?: string;
+    };
+}
 export interface NavLink {
     label: string;
     href: string;
