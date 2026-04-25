@@ -87,7 +87,7 @@ export const FEATURES: Feature[] = [
 ];
 
 export const STEPS: Step[] = [
-    { n: "1", title: "Dial the code", desc: "Tenant dials *384*SmartRental# from any network. No data needed." },
+    { n: "1", title: "Dial the code", desc: "Tenant dials  *384*13137# from any network. No data needed." },
     { n: "2", title: "Enter room & password", desc: "Select room number and authenticate with their PIN." },
     { n: "3", title: "Generate control number", desc: "System generates a unique control number for this month's payment." },
     { n: "4", title: "Receive SMS receipt", desc: "Payment confirmed. Landlord and tenant both get instant SMS confirmation." },

@@ -5,6 +5,7 @@ use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
+use App\Http\Controllers\UssdController;
 
 Route::inertia('/', 'welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -70,4 +71,11 @@ Route::middleware(['auth', 'verified', 'role:tenant'])
             ]);
         })->name('dashboard');
     });
-    
+
+
+// - USSD Area ----------
+Route::post('/ussd/callback', [UssdController::class, 'handle'])
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
+Route::post('/ussd/notify', [UssdController::class, 'notify'])
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
