@@ -12,6 +12,18 @@ Route::inertia('/', 'welcome', [
 
 require __DIR__ . '/settings.php';
 
+// ── Role dispatcher ───────────────────────────────────────────────────────────
+Route::middleware(['auth', 'verified'])
+    ->get('/dashboard', function () {
+        return match (auth()->user()->role) {
+            'landlord' => redirect()->route('landlord.dashboard'),
+            'tenant'   => redirect()->route('tenant.dashboard'),
+            default    => redirect()->route('home'),
+        };
+    })
+    ->name('dashboard');
+
+// ── Landlord area ─────────────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'role:landlord'])
     ->prefix('landlord')
     ->name('landlord.')
@@ -50,6 +62,12 @@ Route::middleware(['auth', 'verified', 'role:tenant'])
     ->prefix('tenant')
     ->name('tenant.')
     ->group(function () {
-        Route::get('/dashboard', fn() => Inertia::render('Tenant/Dashboard'))
-            ->name('dashboard');
+        Route::get('/dashboard', function () {
+            return Inertia::render('Tenant/Dashboard', [
+                'lease'           => null,
+                'next_payment'    => null,
+                'recent_requests' => [],
+            ]);
+        })->name('dashboard');
     });
+    
