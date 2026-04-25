@@ -58,7 +58,7 @@ export default function TenantDashboard({ auth, lease, next_payment, recent_requ
                         {greeting}, {auth.user.name.split(' ')[0]} 👋
                     </h2>
                     <p className="text-xs text-[#F0F6F8]/35 mt-1">
-                        Here's a summary of your rental.
+                        Maisha Hostels, B12
                     </p>
                 </div>
 
