@@ -159,7 +159,7 @@ export function Hero() {
 
                 <p className="text-xs text-[#F0F6F8]/25 font-mono tracking-wide">
                     Dial{" "}
-                    <span className="text-[#00E676]/60">*384*SmartRental#</span> from any
+                    <span className="text-[#00E676]/60">*384*13137#</span> from any
                     phone
                 </p>
 

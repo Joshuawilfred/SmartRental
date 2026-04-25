@@ -23,6 +23,8 @@ class CreateNewUser implements CreatesNewUsers
             ...$this->profileRules(),
             'password' => $this->passwordRules(),
             'role' => ['required', 'in:tenant,landlord'],
+            'phone' => ['required', 'string', 'max:20'],
+            'pin' => ['required', 'digits:4', 'confirmed'],
         ])->validate();
 
         return User::create([
@@ -30,6 +32,8 @@ class CreateNewUser implements CreatesNewUsers
             'email' => $input['email'],
             'password' => $input['password'],
             'role' => $input['role'],
+            'phone' => $input['phone'],
+            'pin' => $input['pin'],
         ]);
     }
 }

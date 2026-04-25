@@ -18,7 +18,7 @@ export default function Register() {
             <Head title="Register" />
             <Form
                 {...store.form()}
-                resetOnSuccess={['password', 'password_confirmation']}
+                resetOnSuccess={['password', 'password_confirmation', 'pin', 'pin_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
             >
@@ -77,11 +77,25 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
+                                <Label htmlFor="phone">Phone number</Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    required
+                                    tabIndex={3}
+                                    autoComplete="tel"
+                                    name="phone"
+                                    placeholder="+255 700 000 000"
+                                />
+                                <InputError message={errors.phone} />
+                            </div>
+
+                            <div className="grid gap-2">
                                 <Label htmlFor="password">Password</Label>
                                 <PasswordInput
                                     id="password"
                                     required
-                                    tabIndex={3}
+                                    tabIndex={4}
                                     autoComplete="new-password"
                                     name="password"
                                     placeholder="Password"
@@ -94,7 +108,7 @@ export default function Register() {
                                 <PasswordInput
                                     id="password_confirmation"
                                     required
-                                    tabIndex={4}
+                                    tabIndex={5}
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder="Confirm password"
@@ -102,10 +116,41 @@ export default function Register() {
                                 <InputError message={errors.password_confirmation} />
                             </div>
 
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="pin">4-digit PIN</Label>
+                                    <Input
+                                        id="pin"
+                                        type="password"
+                                        inputMode="numeric"
+                                        maxLength={4}
+                                        required
+                                        tabIndex={6}
+                                        name="pin"
+                                        placeholder="••••"
+                                    />
+                                    <InputError message={errors.pin} />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="pin_confirmation">Confirm PIN</Label>
+                                    <Input
+                                        id="pin_confirmation"
+                                        type="password"
+                                        inputMode="numeric"
+                                        maxLength={4}
+                                        required
+                                        tabIndex={7}
+                                        name="pin_confirmation"
+                                        placeholder="••••"
+                                    />
+                                    <InputError message={errors.pin_confirmation} />
+                                </div>
+                            </div>
+
                             <Button
                                 type="submit"
                                 className="mt-2 w-full"
-                                tabIndex={5}
+                                tabIndex={8}
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
@@ -115,7 +160,7 @@ export default function Register() {
 
                         <div className="text-center text-sm text-muted-foreground">
                             Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6}>
+                            <TextLink href={login()} tabIndex={9}>
                                 Log in
                             </TextLink>
                         </div>
