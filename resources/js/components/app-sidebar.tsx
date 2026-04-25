@@ -1,5 +1,14 @@
-import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import {
+    BookOpen,
+    Building2,
+    CreditCard,
+    FolderGit2,
+    LayoutGrid,
+    MessageSquare,
+    Settings,
+    Users,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -13,38 +22,50 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
-import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
+import landlord from '@/routes/landlord';
+import tenant from '@/routes/tenant';
+import type { NavItem } from '@/types';
+import type { PageProps } from '@/types';
+
+// ── Nav definitions ───────────────────────────────────────────────────────────
+
+const landlordNavItems: NavItem[] = [
+    { title: 'Dashboard', href: landlord.dashboard(), icon: LayoutGrid },
+    { title: 'Properties', href: landlord.properties.index(), icon: Building2 },
+    { title: 'Tenants', href: landlord.tenants.index(), icon: Users },
+    { title: 'Payments', href: landlord.payments.index(), icon: CreditCard },
+    { title: 'SMS & Alerts', href: landlord.sms.index(), icon: MessageSquare },
+    { title: 'Settings', href: landlord.settings.index(), icon: Settings },
+];
+
+const tenantNavItems: NavItem[] = [
+    { title: 'Dashboard',    href: tenant.dashboard(),           icon: LayoutGrid },
+    { title: 'Payments',     href: '/tenant/payments',           icon: CreditCard },
+    { title: 'Maintenance',  href: '/tenant/maintenance',        icon: MessageSquare },
 ];
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: '#',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: '#',
-        icon: BookOpen,
-    },
+    { title: 'Repository', href: '#', icon: FolderGit2 },
+    { title: 'Documentation', href: '#', icon: BookOpen },
 ];
 
+// ── Component ─────────────────────────────────────────────────────────────────
+
 export function AppSidebar() {
+    const { auth } = usePage<PageProps>().props;
+    const isLandlord = auth.user.role === 'landlord';
+
+    const mainNavItems = isLandlord ? landlordNavItems : tenantNavItems;
+    const homePath = isLandlord ? landlord.dashboard() : tenant.dashboard();
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link href={homePath} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>
