@@ -8,8 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
+import { useState } from 'react';
 
 export default function Register() {
+    const [role, setRole] = useState<'tenant' | 'landlord'>('tenant');
+
     return (
         <>
             <Head title="Register" />
@@ -21,7 +24,29 @@ export default function Register() {
             >
                 {({ processing, errors }) => (
                     <>
+                        <input type="hidden" name="role" value={role} />
                         <div className="grid gap-6">
+
+                            <div className="grid gap-2">
+                                <Label>I am a</Label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {(['tenant', 'landlord'] as const).map((r) => (
+                                        <button
+                                            key={r}
+                                            type="button"
+                                            onClick={() => setRole(r)}
+                                            className={`rounded-md border px-4 py-2 text-sm font-medium capitalize transition-colors ${role === r
+                                                    ? 'border-primary bg-primary text-primary-foreground'
+                                                    : 'border-input bg-background text-muted-foreground hover:bg-accent'
+                                                }`}
+                                        >
+                                            {r}
+                                        </button>
+                                    ))}
+                                </div>
+                                <InputError message={errors.role} />
+                            </div>
+
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
@@ -34,10 +59,7 @@ export default function Register() {
                                     name="name"
                                     placeholder="Full name"
                                 />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
+                                <InputError message={errors.name} className="mt-2" />
                             </div>
 
                             <div className="grid gap-2">
@@ -68,9 +90,7 @@ export default function Register() {
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
+                                <Label htmlFor="password_confirmation">Confirm password</Label>
                                 <PasswordInput
                                     id="password_confirmation"
                                     required
@@ -79,9 +99,7 @@ export default function Register() {
                                     name="password_confirmation"
                                     placeholder="Confirm password"
                                 />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
+                                <InputError message={errors.password_confirmation} />
                             </div>
 
                             <Button

@@ -33,9 +33,25 @@ class PropertyController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        return Inertia::render('Properties/Index', [
-            'properties' => $properties,
-            'filters'    => $request->only('search', 'status'),
+        return Inertia::render('LandLord/Properties/Index', [
+            'properties' => [
+                'data'  => $properties->items(),
+                'links' => [
+                    'first' => $properties->url(1),
+                    'last'  => $properties->url($properties->lastPage()),
+                    'prev'  => $properties->previousPageUrl(),
+                    'next'  => $properties->nextPageUrl(),
+                ],
+                'meta' => [
+                    'current_page' => $properties->currentPage(),
+                    'from'         => $properties->firstItem(),
+                    'last_page'    => $properties->lastPage(),
+                    'per_page'     => $properties->perPage(),
+                    'to'           => $properties->lastItem(),
+                    'total'        => $properties->total(),
+                ],
+            ],
+            'filters' => $request->only('search', 'status'),
         ]);
     }
 
@@ -44,7 +60,7 @@ class PropertyController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Properties/Create');
+        return Inertia::render('LandLord/Properties/Create');
     }
 
     /**
@@ -72,7 +88,7 @@ class PropertyController extends Controller
         });
 
         return redirect()
-            ->route('properties.index')
+            ->route('landlord.properties.index')
             ->with('success', 'Property created successfully.');
     }
 
@@ -85,7 +101,7 @@ class PropertyController extends Controller
 
         $property->load(['images', 'landlord']);
 
-        return Inertia::render('Properties/Show', [
+        return Inertia::render('LandLord/Properties/Show', [
             'property' => $property,
         ]);
     }
@@ -99,7 +115,7 @@ class PropertyController extends Controller
 
         $property->load('images');
 
-        return Inertia::render('Properties/Edit', [
+        return Inertia::render('LandLord/Properties/Edit', [
             'property' => $property,
         ]);
     }
@@ -145,7 +161,7 @@ class PropertyController extends Controller
         });
 
         return redirect()
-            ->route('properties.show', $property)
+            ->route('landlord.properties.show', $property)
             ->with('success', 'Property updated successfully.');
     }
 
@@ -159,7 +175,7 @@ class PropertyController extends Controller
         $property->delete();
 
         return redirect()
-            ->route('properties.index')
+            ->route('landlord.properties.index')
             ->with('success', 'Property removed.');
     }
 

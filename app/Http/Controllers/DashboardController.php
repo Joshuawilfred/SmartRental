@@ -29,7 +29,7 @@ class DashboardController extends Controller
             ->limit(6)
             ->get(['id', 'title', 'location', 'status', 'rental_price']);
 
-        return Inertia::render('Dashboard/Index', [
+        return Inertia::render('LandLord/Index', [
             'stats'             => $stats,
             'recent_properties' => $recent_properties,
         ]);

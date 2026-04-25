@@ -1,6 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import LandlordLayout from '@/layouts/landlord-layout';
 import { PaginatedProperties, Property, PropertyStatus } from '@/types';
 
 interface Props {
@@ -119,7 +118,7 @@ export default function PropertiesIndex({ properties, filters }: Props) {
     };
 
     return (
-        <LandlordLayout title="Properties">
+        <>
             <Head title="Properties — SmartRental" />
 
             {/* Header row */}
@@ -206,6 +205,6 @@ export default function PropertiesIndex({ properties, filters }: Props) {
                     )}
                 </>
             )}
-        </LandlordLayout>
+        </>
     );
 }

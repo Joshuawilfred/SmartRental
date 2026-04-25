@@ -1,10 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
-import LandlordLayout from '@/layouts/landlord-layout';
 import PropertyForm from '@/components/PropertyForm';
 
 export default function PropertiesCreate() {
     return (
-        <LandlordLayout title="Add Property">
+        <>
             <Head title="Add Property — SmartRental" />
 
             {/* Breadcrumb */}
@@ -24,6 +23,6 @@ export default function PropertiesCreate() {
             </div>
 
             <PropertyForm action="/landlord/properties" method="post" />
-        </LandlordLayout>
-    );
+        </>
+    ); 
 }

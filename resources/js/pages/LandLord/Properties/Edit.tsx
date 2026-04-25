@@ -1,5 +1,4 @@
 import { Head, Link } from '@inertiajs/react';
-import LandlordLayout from '@/layouts/landlord-layout';
 import { Property } from '@/types';
 import PropertyForm from '@/components/PropertyForm';
 
@@ -9,7 +8,7 @@ interface Props {
 
 export default function PropertiesEdit({ property }: Props) {
     return (
-        <LandlordLayout title="Edit Property">
+        <>
             <Head title={`Edit — ${property.title}`} />
 
             {/* Breadcrumb */}
@@ -40,6 +39,6 @@ export default function PropertiesEdit({ property }: Props) {
                 action={`/landlord/properties/${property.id}`}
                 method="put"
             />
-        </LandlordLayout>
+        </>
     );
 }

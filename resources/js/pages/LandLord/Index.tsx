@@ -1,6 +1,4 @@
-import { Head } from '@inertiajs/react';
-import { Link } from '@inertiajs/react';
-import LandlordLayout from '@/layouts/landlord-layout';
+import { Head, Link } from '@inertiajs/react';
 import { PageProps } from '@/types';
 
 interface Stats {
@@ -56,7 +54,7 @@ export default function DashboardIndex({ stats, recent_properties, auth }: Props
     const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
     return (
-        <LandlordLayout title="Dashboard">
+        <>
             <Head title="Dashboard — SmartRental" />
 
             {/* Greeting */}
@@ -167,6 +165,6 @@ export default function DashboardIndex({ stats, recent_properties, auth }: Props
                     </table>
                 )}
             </div>
-        </LandlordLayout>
+        </>
     );
 }
