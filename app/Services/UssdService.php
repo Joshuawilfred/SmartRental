@@ -48,38 +48,60 @@ class UssdService
         $parts = $text === '' ? [] : explode('*', $text);
         $depth = count($parts);
 
+        Log::info('USSD processMenu', [
+            'sessionId'   => $sessionId,
+            'phoneNumber' => $phoneNumber,
+            'text'        => $text,
+            'depth'       => $depth,
+        ]);
+
         return match (true) {
             // ── Level 0: first dial ──────────────────────────────────────────────
-            $depth === 0 => $this->showWelcome(),
+            $depth === 0 => $this->showWelcome($sessionId, $phoneNumber),
 
             // ── Level 1: PIN entered ─────────────────────────────────────────────
-            $depth === 1 => $this->handlePin($parts[0], $phoneNumber),
+            $depth === 1 => $this->handlePin($parts[0], $phoneNumber, $sessionId),
 
             // ── Level 2: menu option chosen ──────────────────────────────────────
             $depth === 2 => $this->handleMenuOption($parts[0], $parts[1], $phoneNumber, $sessionId),
 
             // ── Fallback ─────────────────────────────────────────────────────────
-            default => "END Invalid option. Please dial again.",
+            default => $this->logAndEnd($sessionId, $phoneNumber, 'fallback', "END Invalid option. Please dial again."),
         };
     }
 
     // ─── Level 0 ─────────────────────────────────────────────────────────────────
 
-    private function showWelcome(): string
+    private function showWelcome(string $sessionId, string $phoneNumber): string
     {
+        Log::info('USSD session started', [
+            'sessionId'   => $sessionId,
+            'phoneNumber' => $phoneNumber,
+        ]);
+
         return "CON Welcome to SmartRental\n"
             . "Please enter your PIN:";
     }
 
     // ─── Level 1: PIN validation ──────────────────────────────────────────────────
 
-    private function handlePin(string $pin, string $phoneNumber): string
+    private function handlePin(string $pin, string $phoneNumber, string $sessionId): string
     {
-        $tenant = $this->findTenant($phoneNumber);
+        $tenant = $this->findTenant($phoneNumber, $sessionId);
 
         if (!$tenant || $pin !== $tenant['pin']) {
+            Log::warning('USSD PIN invalid', [
+                'sessionId'   => $sessionId,
+                'phoneNumber' => $phoneNumber,
+                'tenantFound' => $tenant !== null,
+            ]);
             return "END Invalid PIN. Please try again.";
         }
+
+        Log::info('USSD PIN accepted, showing main menu', [
+            'sessionId'   => $sessionId,
+            'phoneNumber' => $phoneNumber,
+        ]);
 
         return "CON Login successful!\n"
             . "1. View Due Date\n"
@@ -98,38 +120,69 @@ class UssdService
         string $sessionId
     ): string {
         // Re-validate PIN at every depth so session cannot be forged
-        $tenant = $this->findTenant($phoneNumber);
+        $tenant = $this->findTenant($phoneNumber, $sessionId);
 
         if (!$tenant || $pin !== $tenant['pin']) {
+            Log::warning('USSD PIN re-validation failed', [
+                'sessionId'   => $sessionId,
+                'phoneNumber' => $phoneNumber,
+            ]);
             return "END Session expired. Please dial again.";
         }
 
+        Log::info('USSD menu option selected', [
+            'sessionId'   => $sessionId,
+            'phoneNumber' => $phoneNumber,
+            'choice'      => $choice,
+        ]);
+
         return match ($choice) {
-            '1' => $this->viewDueDate($tenant),
-            '2' => $this->viewRoom($tenant),
-            '3' => $this->generatePayment($tenant, $phoneNumber),
-            '4' => $this->viewReceipt($tenant),
-            '0' => "END Thank you for using SmartRental. Goodbye!",
-            default => "END Invalid choice. Please dial again.",
+            '1' => $this->viewDueDate($tenant, $sessionId, $phoneNumber),
+            '2' => $this->viewRoom($tenant, $sessionId, $phoneNumber),
+            '3' => $this->generatePayment($tenant, $phoneNumber, $sessionId),
+            '4' => $this->viewReceipt($tenant, $sessionId, $phoneNumber),
+            '0' => $this->logAndEnd($sessionId, $phoneNumber, 'exit', "END Thank you for using SmartRental. Goodbye!"),
+            default => $this->logAndEnd($sessionId, $phoneNumber, 'invalid_choice', "END Invalid choice. Please dial again."),
         };
     }
 
     // ─── Menu actions ─────────────────────────────────────────────────────────────
 
-    private function viewDueDate(array $tenant): string
+    private function viewDueDate(array $tenant, string $sessionId, string $phoneNumber): string
     {
+        Log::info('USSD action: view due date', [
+            'sessionId'   => $sessionId,
+            'phoneNumber' => $phoneNumber,
+            'dueDate'     => $tenant['dueDate'],
+            'rentAmount'  => $tenant['rentAmount'],
+        ]);
+
         return "END Your rent of {$tenant['rentAmount']} is due on {$tenant['dueDate']}.";
     }
 
-    private function viewRoom(array $tenant): string
+    private function viewRoom(array $tenant, string $sessionId, string $phoneNumber): string
     {
+        Log::info('USSD action: view room', [
+            'sessionId'   => $sessionId,
+            'phoneNumber' => $phoneNumber,
+            'room'        => $tenant['room'],
+            'floor'       => $tenant['floor'],
+        ]);
+
         return "END Your assigned room is {$tenant['room']}, {$tenant['floor']}.";
     }
 
-    private function generatePayment(array $tenant, string $phoneNumber): string
+    private function generatePayment(array $tenant, string $phoneNumber, string $sessionId): string
     {
         // Generate simulated GePG control number
         $controlNumber = 'GEPG-' . random_int(100000, 999999);
+
+        Log::info('USSD action: GePG control number generated', [
+            'sessionId'     => $sessionId,
+            'phoneNumber'   => $phoneNumber,
+            'controlNumber' => $controlNumber,
+            'rentAmount'    => $tenant['rentAmount'],
+        ]);
 
         // Send SMS to the caller's number (not hardcoded phone)
         $smsMessage = "SmartRental: Your GePG control number is {$controlNumber}. "
@@ -142,8 +195,14 @@ class UssdService
             . "Details sent to your phone via SMS.";
     }
 
-    private function viewReceipt(array $tenant): string
+    private function viewReceipt(array $tenant, string $sessionId, string $phoneNumber): string
     {
+        Log::info('USSD action: view receipt', [
+            'sessionId'   => $sessionId,
+            'phoneNumber' => $phoneNumber,
+            'lastPayment' => $tenant['lastPayment'],
+        ]);
+
         return "END Last payment: {$tenant['lastPayment']}.";
     }
 
@@ -156,18 +215,40 @@ class UssdService
      * For production: replace with  Tenant::where('phone', $phone)->first()
      * and return $tenant->toArray() or null.
      */
-    private function findTenant(string $phoneNumber): ?array
+    private function findTenant(string $phoneNumber, string $sessionId): ?array
     {
         // Demo: match any caller to the single demo tenant
         // (Africa's Talking sandbox always sends the registered test number)
         if ($phoneNumber === $this->demoTenant['phone'] || app()->environment('local', 'staging')) {
+            Log::debug('USSD tenant lookup: found', [
+                'sessionId'   => $sessionId,
+                'phoneNumber' => $phoneNumber,
+            ]);
             return $this->demoTenant;
         }
+
+        Log::warning('USSD tenant lookup: not found', [
+            'sessionId'   => $sessionId,
+            'phoneNumber' => $phoneNumber,
+        ]);
 
         // Production lookup (uncomment when you have a tenants table):
         // $tenant = Tenant::where('phone', $phoneNumber)->first();
         // return $tenant?->toArray();
 
         return null;
+    }
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+    private function logAndEnd(string $sessionId, string $phoneNumber, string $reason, string $message): string
+    {
+        Log::info('USSD session ending', [
+            'sessionId'   => $sessionId,
+            'phoneNumber' => $phoneNumber,
+            'reason'      => $reason,
+        ]);
+
+        return $message;
     }
 }

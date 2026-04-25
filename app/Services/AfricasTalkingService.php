@@ -43,6 +43,11 @@ class AfricasTalkingService
     public function sendSms(string $to, string $message): void
     {
         try {
+            Log::info('AT SMS sending', [
+                'to'      => $to,
+                'message' => $message,
+            ]);
+
             $response = Http::withHeaders([
                 'apiKey' => $this->apiKey,
                 'Accept' => 'application/json',

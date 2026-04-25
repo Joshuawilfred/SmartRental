@@ -29,6 +29,12 @@ class UssdController extends Controller
 
         $response = $this->ussd->processMenu($sessionId, $phoneNumber, $text);
 
+        Log::info('USSD response', [
+            'sessionId'  => $sessionId,
+            'type'       => str_starts_with($response, 'CON') ? 'CON' : 'END',
+            'response'   => $response,
+        ]);
+
         return response($response, 200)
             ->header('Content-Type', 'text/plain');
     }
