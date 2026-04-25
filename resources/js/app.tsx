@@ -20,8 +20,8 @@ createInertiaApp({
             case name.startsWith('settings/'):
                 return [AppLayout, SettingsLayout];
             case name.startsWith('LandLord/'):
-            case name.startsWith('Tenant/'):
                 return LandlordLayout;
+            case name.startsWith('Tenant/'):
             default:
                 return AppLayout;
         }

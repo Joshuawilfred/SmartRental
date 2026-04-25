@@ -55,7 +55,7 @@ export default function PropertiesShow({ property }: Props) {
     };
 
     return (
-        <LandlordLayout title={property.title}>
+        <>
             <Head title={`${property.title} — SmartRental`} />
 
             {/* Breadcrumb */}
@@ -210,6 +210,6 @@ export default function PropertiesShow({ property }: Props) {
                     </div>
                 </div>
             </div>
-        </LandlordLayout>
+        </>
     );
 }

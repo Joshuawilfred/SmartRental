@@ -41,13 +41,13 @@ const landlordNavItems: NavItem[] = [
 
 const tenantNavItems: NavItem[] = [
     { title: 'Dashboard',    href: tenant.dashboard(),           icon: LayoutGrid },
-    { title: 'Payments',     href: '/tenant/payments',           icon: CreditCard },
-    { title: 'Maintenance',  href: '/tenant/maintenance',        icon: MessageSquare },
+    { title: 'Payments',     href: '#',           icon: CreditCard },
+    { title: 'Maintenance',  href: '#',        icon: MessageSquare },
 ];
 
 const footerNavItems: NavItem[] = [
-    { title: 'Repository', href: '#', icon: FolderGit2 },
-    { title: 'Documentation', href: '#', icon: BookOpen },
+    { title: 'Customer Support', href: '#', icon: FolderGit2 },
+    { title: 'Room Management', href: '#', icon: BookOpen },
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
